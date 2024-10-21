@@ -1,12 +1,5 @@
 {
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/.server/**/*.ts",
-    "**/.server/**/*.tsx",
-    "**/.client/**/*.ts",
-    "**/.client/**/*.tsx"
-  ],
+  "include": ["env.d.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["@remix-run/node", "vite/client"],
@@ -26,7 +19,7 @@
       "~/*": ["./app/*"]
     },
 
-    // Vite takes care of building everything, not tsc.
+    // Remix takes care of building everything in `remix build`.
     "noEmit": true
   }
 }
