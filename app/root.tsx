@@ -20,7 +20,6 @@ export const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
       </head>
       <body>
         <div id="content">{children}</div>
-
         <ScrollRestoration />
         <Scripts />
       </body>
