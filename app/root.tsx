@@ -1,7 +1,6 @@
 import {
   Links,
   Meta,
-  Form,
   Scripts,
   ScrollRestoration,
   Outlet,
@@ -18,7 +17,7 @@ export const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-[#eeeeee]">
         <div id="content">{children}</div>
         <ScrollRestoration />
         <Scripts />
