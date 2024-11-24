@@ -17,14 +17,14 @@ const SlipLibrary: React.FC = () => {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline">Edit Profile</Button>
+        <Button variant="outline" className="mx-6">Select slips</Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>Edit profile</DrawerTitle>
-          <DrawerDescription>Make changes to your profile here. Click save when you're done.</DrawerDescription>
+          <DrawerTitle>Select slips</DrawerTitle>
+          <DrawerDescription>Description.</DrawerDescription>
         </DrawerHeader>
-        <p>sdfsdfsdfdsf</p>
+        <p className="p-4">CONTENT</p>
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>

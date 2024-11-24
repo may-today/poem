@@ -15,6 +15,7 @@ export const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#aadfef" />
         <Meta />
         <Links />
       </head>
@@ -36,9 +37,10 @@ const App: React.FC = () => {
       <div className="mx-auto w-full max-w-screen-lg">
         <span
           className={clsx([
-            'rounded-full bg-gradient-to-r from-sky-400 to-teal-300',
+            'md:rounded-full bg-gradient-to-t md:bg-gradient-to-r from-sky-400 to-teal-300',
             'opacity-40 aspect-square blur-3xl bottom-[calc(100%-120px)]',
-            'w-full max-w-screen-lg fixed -z-10',
+            'md:w-full absolute -z-10',
+            '-left-20 md:left-0 -right-20 md:right-0',
           ])}
         />
       </div>
