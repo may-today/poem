@@ -14,6 +14,7 @@
     "@dnd-kit/sortable": "^9.0.0",
     "@remix-run/node": "^2.13.1",
     "@remix-run/react": "^2.13.1",
+    "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",
     "isbot": "^4",
     "lucide-react": "^0.460.0",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@remix-run/dev": "^2.13.1",
     "@types/bun": "^1.1.12",
+    "@types/canvas-confetti": "^1.6.4",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.20",

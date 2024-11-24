@@ -12,6 +12,7 @@ import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import type { DragStartEvent, DragOverEvent, DragEndEvent } from '@dnd-kit/core'
 import { debounce } from '@/utils/scheduled'
 import { LINEID_NEWLINE_BEFORE, LINEID_NEWLINE_AFTER, preserveLineIds } from '@/utils/constants'
+import { startConfetti } from '@/utils/anims'
 
 import PoemEditorLine from './PoemEditorLine'
 import PoemEditorNewLine from './PoemEditorNewLine'
@@ -96,6 +97,7 @@ const PoemEditor: React.FC = () => {
     const overLineId = findLineId(overId)
     if (prevLineId && overLineId && preserveLineIds.includes(overLineId)) {
       const newLineId = Date.now().toString()
+      startConfetti()
       setItems((prev) => {
         const prevActiveItems = prev[prevLineId]
         const prevActiveIndex = prevActiveItems.indexOf(activeId)
