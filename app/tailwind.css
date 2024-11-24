@@ -16,4 +16,35 @@
   html {
     font-family: 'ZhuqueFangsong', system-ui, sans-serif;
   }
+  body {
+    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
+    background: #eeeeee;
+    height: 100%;
+  }
+}
+
+@layer components {
+  .paper-slip {
+    @apply flex justify-center items-center bg-white px-2 h-8 m-1 shadow-sm;
+    @apply select-none cursor-grab active:cursor-grabbing transition-transform;
+  }
+  .paper-slip:nth-child(3n+1) {
+    border-bottom-left-radius: 10rem 1rem;
+    border-bottom-right-radius: 1rem 10rem;
+    border-top-left-radius: 1rem 16rem;
+    border-top-right-radius: 32rem 1rem;
+  }
+  .paper-slip:nth-child(3n+2) {
+    border-bottom-left-radius: 16rem 1.2rem;
+    border-bottom-right-radius: 1rem 12rem;
+    border-top-left-radius: 16rem 1rem;
+    border-top-right-radius: 1rem 12rem;
+  }
+  .paper-slip:nth-child(3n+3) {
+    border-bottom-left-radius: 1.4rem 12rem;
+    border-bottom-right-radius: 1.2rem 16rem;
+    border-top-left-radius: 1rem 16rem;
+    border-top-right-radius: 8rem 2rem;
+  }
 }

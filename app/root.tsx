@@ -5,6 +5,7 @@ import {
   ScrollRestoration,
   Outlet,
 } from '@remix-run/react'
+import clsx from 'clsx'
 
 import './tailwind.css'
 
@@ -17,8 +18,8 @@ export const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
         <Meta />
         <Links />
       </head>
-      <body className="bg-[#eeeeee]">
-        <div id="content">{children}</div>
+      <body>
+        {children}
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -27,7 +28,25 @@ export const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
 }
 
 const App: React.FC = () => {
-  return <Outlet />
+  return (
+    <>
+      <div className="mx-auto max-w-screen-lg">
+        <span
+          className={clsx([
+            'rounded-full bg-gradient-to-r from-sky-400 to-teal-300',
+            'opacity-40 -z-10 aspect-square w-full max-w-screen-lg blur-3xl bottom-[calc(100%-100px)] fixed',
+          ])}
+        />
+      </div>
+      <div className="max-w-2xl mx-auto">
+        <Outlet />
+      </div>
+    </>
+  )
+}
+
+export const HydrateFallback = () => {
+  return <p>Loading...</p>
 }
 
 export default App
