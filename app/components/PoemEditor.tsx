@@ -103,19 +103,15 @@ const PoemEditor: React.FC = () => {
         const prevActiveIndex = prevActiveItems.indexOf(activeId)
         if (overLineId === LINEID_NEWLINE_BEFORE) {
           return {
-            [newLineId]: [
-              items[prevLineId][prevActiveIndex],
-            ],
+            [newLineId]: [items[prevLineId][prevActiveIndex]],
             ...prev,
             [prevLineId]: [...prev[prevLineId].filter((item) => item !== activeId)],
           }
-        } 
+        }
         return {
           ...prev,
           [prevLineId]: [...prev[prevLineId].filter((item) => item !== activeId)],
-          [newLineId]: [
-            items[prevLineId][prevActiveIndex],
-          ],
+          [newLineId]: [items[prevLineId][prevActiveIndex]],
         }
       })
       setActiveLine(null)
@@ -153,8 +149,8 @@ const PoemEditor: React.FC = () => {
         onDragEnd={handleDragEnd}
       >
         <PoemEditorNewLine id={LINEID_NEWLINE_BEFORE} hover={activeLine === LINEID_NEWLINE_BEFORE} />
-        {Object.keys(items).map((lineId) => (
-          <PoemEditorLine key={lineId} id={lineId} items={items[lineId]} hover={activeLine === lineId} />
+        {Object.keys(items).map((lineId, index) => (
+          <PoemEditorLine key={lineId} id={lineId} index={index} items={items[lineId]} hover={activeLine === lineId} />
         ))}
         <PoemEditorNewLine id={LINEID_NEWLINE_AFTER} hover={activeLine === LINEID_NEWLINE_AFTER} />
         <DragOverlay>{activeId ? <PoemPaperSlip id={activeId.toString()} /> : null}</DragOverlay>
