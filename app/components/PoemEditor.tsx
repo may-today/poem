@@ -11,22 +11,36 @@ import {
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import type { DragStartEvent, DragOverEvent, DragEndEvent } from '@dnd-kit/core'
 import { debounce } from '@/utils/scheduled'
-import { LINEID_NEWLINE_BEFORE, LINEID_NEWLINE_AFTER, preserveLineIds } from '@/utils/constants'
-import { startConfetti } from '@/utils/anims'
+import { LINEID_NEWLINE_BEFORE, LINEID_NEWLINE_AFTER, LINEID_INITIAL, preserveLineIds } from '@/utils/constants'
+// import { startConfetti } from '@/utils/anims'
 
 import PoemEditorLine from './PoemEditorLine'
 import PoemEditorNewLine from './PoemEditorNewLine'
 import PoemPaperSlip from './PoemPaperSlip'
+import PoemEditorInitialBox from './PoemEditorInitialBox'
+
+const genRandomLineId = () => {
+  return `line:${Math.random().toString(36).substring(2, 15)}`
+}
 
 const PoemEditor: React.FC = () => {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [activeLine, setActiveLine] = useState<string | null>(null)
+  const [initialItems, setInitialItems] = useState<string[]>([
+    '用最小回忆',
+    '香槟和气球',
+    '月光晒干眼泪',
+    '别走',
+    '从前只想装懂',
+    '再没有后路',
+    '加强了幽默',
+    '在失去你的风景里面',
+  ])
+  const initialNewLineId = genRandomLineId()
   const [items, setItems] = useState<Record<string, string[]>>({
-    line1: ['用最小回忆', '香槟和气球', '月光晒干眼泪', '别走', '从前只想装懂'],
-    line2: ['它给了你自由', '等你回答', '就当我飞翔', '买一杯果汁'],
-    line3: ['这一刻', '星星在闪烁', '你孤独的生存', '喝着汽水'],
-    line4: ['少年回头望', '想变成', '幻觉'],
+    [initialNewLineId]: [],
   })
+  const [lineIds, setLineIds] = useState<string[]>([initialNewLineId])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -36,11 +50,11 @@ const PoemEditor: React.FC = () => {
   )
 
   const findLineId = (id: string) => {
-    if (preserveLineIds.includes(id)) {
+    if (id.startsWith('line:')) {
       return id
     }
-    if (id in items) {
-      return id as string
+    if (initialItems.includes(id)) {
+      return LINEID_INITIAL
     }
     return Object.keys(items).find((key) => items[key].includes(id))
   }
@@ -57,6 +71,8 @@ const PoemEditor: React.FC = () => {
     const overId = event.over.id as string
     const prevLineId = findLineId(activeId)
     const overLineId = findLineId(overId)
+    console.log('prevLineId', prevLineId, activeId)
+    console.log('overLineId', overLineId, overId)
     if (overLineId) {
       setActiveLine(overLineId)
     }
@@ -66,20 +82,30 @@ const PoemEditor: React.FC = () => {
     if (preserveLineIds.includes(overLineId)) {
       return
     }
-
+    if (preserveLineIds.includes(prevLineId)) {
+      return
+    }
+    // if (prevLineId === LINEID_INITIAL) {
+    //   setInitialItems((prev) => [...prev.filter((item) => item !== activeId)])
+    // }
     setItems((prev) => {
-      const prevActiveItems = prev[prevLineId]
-      const prevOverItems = prev[overLineId]
+      const prevActiveItems = prev[prevLineId] || []
+      const prevOverItems = prev[overLineId] || []
       const prevActiveIndex = prevActiveItems.indexOf(activeId)
       const prevOverIndex = prevOverItems.indexOf(overId)
-
+      if (prevLineId === LINEID_INITIAL) {
+        return {
+          ...prev,
+          [overLineId]: [...prevOverItems, activeId],
+        }
+      }
       return {
         ...prev,
-        [prevLineId]: [...prev[prevLineId].filter((item) => item !== activeId)],
+        [prevLineId]: [...prevActiveItems.filter((item) => item !== activeId)],
         [overLineId]: [
-          ...prev[overLineId].slice(0, prevOverIndex),
-          items[prevLineId][prevActiveIndex],
-          ...prev[overLineId].slice(prevOverIndex, prev[overLineId].length),
+          ...prevOverItems.slice(0, prevOverIndex),
+          prevActiveItems[prevActiveIndex],
+          ...prevOverItems.slice(prevOverIndex, prevOverItems.length),
         ],
       }
     })
@@ -95,26 +121,23 @@ const PoemEditor: React.FC = () => {
     const overId = event.over.id as string
     const prevLineId = findLineId(activeId)
     const overLineId = findLineId(overId)
-    if (prevLineId && overLineId && preserveLineIds.includes(overLineId)) {
-      const newLineId = Date.now().toString()
-      startConfetti()
+    if (overLineId === LINEID_NEWLINE_BEFORE) {
+      generateNewLine('before')
+      return
+    }
+    if (overLineId === LINEID_NEWLINE_AFTER) {
+      generateNewLine('after')
+      return
+    }
+    if (prevLineId === LINEID_INITIAL && overLineId && !preserveLineIds.includes(overLineId)) {
+      // move to a new line
+      setInitialItems((prev) => [...prev.filter((item) => item !== activeId)])
       setItems((prev) => {
-        const prevActiveItems = prev[prevLineId]
-        const prevActiveIndex = prevActiveItems.indexOf(activeId)
-        if (overLineId === LINEID_NEWLINE_BEFORE) {
-          return {
-            [newLineId]: [items[prevLineId][prevActiveIndex]],
-            ...prev,
-            [prevLineId]: [...prev[prevLineId].filter((item) => item !== activeId)],
-          }
-        }
         return {
           ...prev,
-          [prevLineId]: [...prev[prevLineId].filter((item) => item !== activeId)],
-          [newLineId]: [items[prevLineId][prevActiveIndex]],
+          [overLineId]: [...(prev[overLineId] || []), activeId],
         }
       })
-      setActiveLine(null)
       return
     }
     if (!prevLineId || !overLineId || prevLineId !== overLineId) {
@@ -127,9 +150,9 @@ const PoemEditor: React.FC = () => {
         // delete empty line
         // biome-ignore lint/complexity/noForEach: <explanation>
         Object.keys(prev).forEach((key) => {
-          if (prev[key].length === 0) {
-            delete prev[key]
-          }
+          // if (prev[key].length === 0) {
+          //   delete prev[key]
+          // }
         })
         return {
           ...prev,
@@ -139,8 +162,33 @@ const PoemEditor: React.FC = () => {
     }
   }
 
+  const generateNewLine = (type: 'before' | 'after') => {
+    const newLineId = genRandomLineId()
+    if (type === 'before') {
+      setLineIds((prev) => [newLineId, ...prev])
+      setItems((prev) => {
+        return {
+          ...prev,
+          [newLineId]: [],
+        }
+      })
+    } else {
+      setLineIds((prev) => [...prev, newLineId])
+      setItems((prev) => {
+        return {
+          ...prev,
+          [newLineId]: [],
+        }
+      })
+    }
+    return newLineId
+  }
+
   return (
     <div className="flex flex-col">
+      <div className="my-4">
+        <PoemEditorInitialBox id={LINEID_INITIAL} items={initialItems} hover={activeLine === LINEID_INITIAL} />
+      </div>
       <DndContext
         sensors={sensors}
         collisionDetection={pointerWithin}
@@ -149,8 +197,14 @@ const PoemEditor: React.FC = () => {
         onDragEnd={handleDragEnd}
       >
         <PoemEditorNewLine id={LINEID_NEWLINE_BEFORE} hover={activeLine === LINEID_NEWLINE_BEFORE} />
-        {Object.keys(items).map((lineId, index) => (
-          <PoemEditorLine key={lineId} id={lineId} index={index} items={items[lineId]} hover={activeLine === lineId} />
+        {lineIds.map((lineId, index) => (
+          <PoemEditorLine
+            key={lineId}
+            id={lineId}
+            index={index}
+            items={items[lineId] || []}
+            hover={activeLine === lineId}
+          />
         ))}
         <PoemEditorNewLine id={LINEID_NEWLINE_AFTER} hover={activeLine === LINEID_NEWLINE_AFTER} />
         <DragOverlay>{activeId ? <PoemPaperSlip id={activeId.toString()} /> : null}</DragOverlay>

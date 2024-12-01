@@ -3,14 +3,13 @@ import { useDroppable } from '@dnd-kit/core'
 import clsx from 'clsx'
 import PoemPaperSortableSlip from './PoemPaperSortableSlip'
 
-interface PoemEditorLineProps {
+interface PoemEditorInitialBoxProps {
   id: string
   items: string[]
-  index?: number
   hover: boolean
 }
 
-const PoemEditorLine: React.FC<PoemEditorLineProps> = (props) => {
+const PoemEditorInitialBox: React.FC<PoemEditorInitialBoxProps> = (props) => {
   const { setNodeRef } = useDroppable({ id: props.id })
 
   return (
@@ -19,10 +18,7 @@ const PoemEditorLine: React.FC<PoemEditorLineProps> = (props) => {
         ref={setNodeRef}
         className={clsx([
           'flex justify-start flex-wrap min-h-14 p-2',
-          'border border-gray-400/50 border-dashed transition-colors',
-          'border-b-0',
-          props.index === 0 && 'border-t-0',
-          props.hover ? 'bg-black/5' : '',
+          'border border-gray-400/50 border-dashed',
         ])}
       >
         {props.items.map((id) => (
@@ -33,4 +29,4 @@ const PoemEditorLine: React.FC<PoemEditorLineProps> = (props) => {
   )
 }
 
-export default PoemEditorLine
+export default PoemEditorInitialBox
