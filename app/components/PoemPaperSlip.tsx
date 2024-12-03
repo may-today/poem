@@ -11,8 +11,19 @@ const PoemPaperSlip: React.FC<PoemPaperSlipProps> = (props) => {
     return `rotate(${rotation}deg)`
   }, [])
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      props.onClick?.()
+    }
+  }
+
   return (
-    <div style={{ transform: randomRotation }} className="paper-slip">
+    <div
+      style={{ transform: randomRotation }}
+      className="paper-slip"
+      onClick={props.onClick}
+      onKeyDown={handleKeyDown}
+    >
       {props.id}
     </div>
   )

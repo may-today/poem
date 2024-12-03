@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   DndContext,
   KeyboardSensor,
@@ -13,6 +13,7 @@ import type { DragStartEvent, DragOverEvent, DragEndEvent } from '@dnd-kit/core'
 import { debounce } from '@/utils/scheduled'
 import { LINEID_NEWLINE_BEFORE, LINEID_NEWLINE_AFTER, LINEID_INITIAL, preserveLineIds } from '@/utils/constants'
 // import { startConfetti } from '@/utils/anims'
+import wordMap from '@/dict/wordMap.json'
 
 import PoemEditorLine from './PoemEditorLine'
 import PoemEditorNewLine from './PoemEditorNewLine'
@@ -24,18 +25,14 @@ const genRandomLineId = () => {
 }
 
 const PoemEditor: React.FC = () => {
+  const initialItems = useMemo(() => {
+    return Object.values(wordMap)
+      .flat()
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 50)
+  }, [])
   const [activeId, setActiveId] = useState<string | null>(null)
   const [activeLine, setActiveLine] = useState<string | null>(null)
-  const [initialItems, setInitialItems] = useState<string[]>([
-    '用最小回忆',
-    '香槟和气球',
-    '月光晒干眼泪',
-    '别走',
-    '从前只想装懂',
-    '再没有后路',
-    '加强了幽默',
-    '在失去你的风景里面',
-  ])
   const initialNewLineId = genRandomLineId()
   const [items, setItems] = useState<Record<string, string[]>>({
     [initialNewLineId]: [],
@@ -131,7 +128,7 @@ const PoemEditor: React.FC = () => {
     }
     if (prevLineId === LINEID_INITIAL && overLineId && !preserveLineIds.includes(overLineId)) {
       // move to a new line
-      setInitialItems((prev) => [...prev.filter((item) => item !== activeId)])
+      // setInitialItems((prev) => [...prev.filter((item) => item !== activeId)])
       setItems((prev) => {
         return {
           ...prev,
