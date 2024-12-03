@@ -2,6 +2,7 @@ import { useMemo, useEffect } from 'react'
 
 interface PoemPaperSlipProps {
   id: string
+  onClick?: () => void
 }
 
 const PoemPaperSlip: React.FC<PoemPaperSlipProps> = (props) => {
