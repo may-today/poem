@@ -13,24 +13,15 @@ import type { DragStartEvent, DragOverEvent, DragEndEvent } from '@dnd-kit/core'
 import { debounce } from '@/utils/scheduled'
 import { LINEID_NEWLINE_BEFORE, LINEID_NEWLINE_AFTER, LINEID_INITIAL, preserveLineIds } from '@/utils/constants'
 // import { startConfetti } from '@/utils/anims'
-import wordMap from '@/dict/wordMap.json'
-
 import PoemEditorLine from './PoemEditorLine'
 import PoemEditorNewLine from './PoemEditorNewLine'
 import PoemPaperSlip from './PoemPaperSlip'
-import PoemEditorInitialBox from './PoemEditorInitialBox'
 
 const genRandomLineId = () => {
   return `line:${Math.random().toString(36).substring(2, 15)}`
 }
 
 const PoemEditor: React.FC = () => {
-  const initialItems = useMemo(() => {
-    return Object.values(wordMap)
-      .flat()
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 50)
-  }, [])
   const [activeId, setActiveId] = useState<string | null>(null)
   const [activeLine, setActiveLine] = useState<string | null>(null)
   const initialNewLineId = genRandomLineId()
@@ -183,9 +174,6 @@ const PoemEditor: React.FC = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="my-4">
-        <PoemEditorInitialBox id={LINEID_INITIAL} items={initialItems} hover={activeLine === LINEID_INITIAL} />
-      </div>
       <DndContext
         sensors={sensors}
         collisionDetection={pointerWithin}

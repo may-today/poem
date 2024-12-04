@@ -1,24 +1,4 @@
-interface LyricLine {
-  time: number
-  text: string
-  isHighlight: boolean
-  toneText?: string
-  toneText2?: string
-}
-
-interface SongDetail {
-  title: string
-  slug: string
-  meta: {
-    year?: number
-    album?: string
-    lyricist?: string
-    composer?: string
-    banlam: boolean
-    length?: number
-  }
-  detail: LyricLine[]
-}
+import type { SongDetail } from './type'
 
 const response = await fetch('https://wx-static.ddiu.site/dataset/mayday.json')
 const json = (await response.json()) as SongDetail[]

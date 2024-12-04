@@ -1,4 +1,5 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
+import { useDataStore } from '@/stores/data'
 
 interface PoemPaperSlipProps {
   id: string
@@ -6,6 +7,8 @@ interface PoemPaperSlipProps {
 }
 
 const PoemPaperSlip: React.FC<PoemPaperSlipProps> = (props) => {
+  const getWordById = useDataStore((state) => state.getWordById)
+
   const randomRotation = useMemo(() => {
     const rotation = (Math.random() - 0.5) * 4
     return `rotate(${rotation}deg)`
@@ -24,7 +27,7 @@ const PoemPaperSlip: React.FC<PoemPaperSlipProps> = (props) => {
       onClick={props.onClick}
       onKeyDown={handleKeyDown}
     >
-      {props.id}
+      {getWordById(props.id)}
     </div>
   )
 }

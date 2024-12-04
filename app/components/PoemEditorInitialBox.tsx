@@ -1,27 +1,25 @@
-import { useDroppable } from '@dnd-kit/core'
 import clsx from 'clsx'
+import { useDataStore } from '@/stores/data'
+import { usePoemStore } from '@/stores/poem'
 import PoemPaperSlip from './PoemPaperSlip'
 
-interface PoemEditorInitialBoxProps {
-  id: string
-  items: string[]
-  hover: boolean
-}
-
-const PoemEditorInitialBox: React.FC<PoemEditorInitialBoxProps> = (props) => {
-  const { setNodeRef } = useDroppable({ id: props.id })
+const PoemEditorInitialBox: React.FC = (props) => {
+  const wordIdFlattenMap = useDataStore((state) => state.wordIdFlattenMap)
+  const addSelectedWordId = usePoemStore((state) => state.addSelectedWordId)
+  const initialItems = Object.keys(wordIdFlattenMap)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 50)
 
   return (
     <div
-      ref={setNodeRef}
       className={clsx(['flex justify-start flex-wrap min-h-14 p-2', 'border border-gray-400/50 border-dashed'])}
     >
-      {props.items.map((id) => (
+      {initialItems.map((id) => (
         <PoemPaperSlip
           key={id.toString()}
           id={id.toString()}
           onClick={() => {
-            console.log('clicked', id)
+            addSelectedWordId(id)
           }}
         />
       ))}
