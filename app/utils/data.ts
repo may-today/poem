@@ -16,8 +16,7 @@ export const getWordIdSlugMap = () => {
   return idSlugMap
 }
 
-export const getWordIdFlattenMap = () => {
-  const slugMap = getWordIdSlugMap()
+export const getWordIdFlattenMap = (slugMap: SlugMap) => {
   const wordIdMap: Record<string, string> = {}
   for (const [_songSlug, wordMap] of Object.entries(slugMap)) {
     for (const [wordId, word] of Object.entries(wordMap)) {

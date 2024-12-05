@@ -44,7 +44,7 @@ const App: React.FC = () => {
           ])}
         />
       </div>
-      <div className="flex-1 flex flex-col items-stretch w-full max-w-2xl mx-auto">
+      <div className="flex-1 flex flex-col items-stretch w-full max-w-4xl mx-auto overflow-hidden">
         <Outlet />
       </div>
     </>

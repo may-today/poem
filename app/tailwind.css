@@ -81,7 +81,7 @@
 
 @layer components {
   .paper-slip {
-    @apply flex justify-center items-center bg-white px-2 h-8 m-1 shadow-sm;
+    @apply inline-flex justify-center items-center bg-white px-2 h-8 m-1 shadow-sm;
     @apply select-none cursor-grab active:cursor-grabbing transition-transform;
   }
   .paper-slip:nth-child(3n+1) {

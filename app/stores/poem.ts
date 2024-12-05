@@ -3,6 +3,7 @@ import { devtools } from 'zustand/middleware'
 
 type State = {
   selectedWordIds: string[]
+  lineIdList: string[]
 }
 
 type Actions = {

@@ -1,28 +1,19 @@
-import { create } from 'zustand'
+import { atom } from 'jotai'
 import { getWordIdFlattenMap, getWordIdSlugMap } from '@/utils/data'
 
 type SlugMap = Record<string, Record<string, string>>
 
-type State = {
-  wordIdSlugMap: SlugMap
-  wordIdFlattenMap: Record<string, string>
-}
+const wordIdSlugMapAtom = atom<SlugMap>({})
+export const wordIdFlattenMapAtom = atom((get) => getWordIdFlattenMap(get(wordIdSlugMapAtom)))
+export const randomWordIdListAtom = atom((get) =>
+  Object.keys(get(wordIdFlattenMapAtom)).sort(() => Math.random() - 0.5).slice(0, 50),
+)
 
-type Actions = {
-  prepareData: () => void
-  getWordById: (id: string) => string | undefined
-}
+export const prepareData = atom(null, (get, set) => {
+  const slugMap = getWordIdSlugMap()
+  set(wordIdSlugMapAtom, slugMap)
+})
 
-export const useDataStore = create<State & Actions>((set, get) => ({
-  wordIdSlugMap: {},
-  wordIdFlattenMap: {},
-  prepareData: () => {
-    set({
-      wordIdSlugMap: getWordIdSlugMap(),
-      wordIdFlattenMap: getWordIdFlattenMap(),
-    })
-  },
-  getWordById: (id: string) => {
-    return get().wordIdFlattenMap[id]
-  },
-}))
+export const wordByIdAtom = atom((get) => (id: string) => {
+  return get(wordIdFlattenMapAtom)[id]
+})
