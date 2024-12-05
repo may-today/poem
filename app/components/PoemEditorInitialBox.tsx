@@ -1,17 +1,22 @@
 import clsx from 'clsx'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { randomWordIdListAtom } from '@/stores/data'
-// import { usePoemStore } from '@/stores/poem'
+import { importWordToLastLineAtom, isInSelectedWordsAtom } from '@/stores/poem'
 import PoemPaperSlip from './PoemPaperSlip'
 import { InfiniteSlider } from '@/components/motion-ui/infinite-slider'
 
-const PoemEditorInitialBox: React.FC = (props) => {
+const PoemEditorInitialBox: React.FC<{
+  animated?: boolean
+}> = (props) => {
   const randomWordIdList = useAtomValue(randomWordIdListAtom)
-  const groupList = generateGroupList(randomWordIdList)
+  const isInSelectedWords = useAtomValue(isInSelectedWordsAtom)
+  const importWordToLastLine = useSetAtom(importWordToLastLineAtom)
+  const groupList = generateGroupList(randomWordIdList, 5)
+  const container = document.getElementById('scroll-container')
 
   return (
     <div className={clsx(['relative flex justify-start flex-wrap'])}>
-      {groupList.map((group, index) => (
+      {props.animated && groupList.map((group, index) => (
         <InfiniteSlider
           key={group.join('-')}
           gap={0}
@@ -19,20 +24,38 @@ const PoemEditorInitialBox: React.FC = (props) => {
           duration={120}
           durationOnHover={360}
         >
-          {group.map((id) => (
-            <PoemPaperSlip key={id.toString()} id={id.toString()} />
+          {group.map((wordId) => (
+            <PoemPaperSlip
+              key={wordId}
+              id={wordId}
+              active={isInSelectedWords(wordId)}
+              onClick={() => {
+                !isInSelectedWords(wordId) && importWordToLastLine(wordId)
+              }}
+            />
           ))}
         </InfiniteSlider>
+      ))}
+      {!props.animated && randomWordIdList.map((wordId) => (
+        <PoemPaperSlip
+          key={wordId}
+          id={wordId}
+          active={isInSelectedWords(wordId)}
+          onClick={() => {
+            importWordToLastLine(wordId)
+            container?.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
+          }}
+        />
       ))}
     </div>
   )
 }
 
 // 将wordIdList平均分为5组
-const generateGroupList = (wordIdList: string[]) => {
+const generateGroupList = (wordIdList: string[], groupAmount: number) => {
   const groupList = []
-  const groupSize = Math.ceil(wordIdList.length / 5)
-  for (let i = 0; i < 5; i++) {
+  const groupSize = Math.ceil(wordIdList.length / groupAmount)
+  for (let i = 0; i < groupAmount; i++) {
     groupList.push(wordIdList.slice(i * groupSize, (i + 1) * groupSize))
   }
   return groupList

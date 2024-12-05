@@ -82,24 +82,35 @@
 @layer components {
   .paper-slip {
     @apply inline-flex justify-center items-center bg-white px-2 h-8 m-1 shadow-sm;
-    @apply select-none cursor-grab active:cursor-grabbing transition-transform;
+    @apply select-none cursor-grab active:cursor-grabbing transition-all duration-300 touch-none;
   }
-  .paper-slip:nth-child(3n+1) {
+  .paper-slip:nth-child(3n + 1) {
     border-bottom-left-radius: 10rem 1rem;
     border-bottom-right-radius: 1rem 10rem;
     border-top-left-radius: 1rem 16rem;
     border-top-right-radius: 32rem 1rem;
   }
-  .paper-slip:nth-child(3n+2) {
+  .paper-slip:nth-child(3n + 2) {
     border-bottom-left-radius: 16rem 1.2rem;
     border-bottom-right-radius: 1rem 12rem;
     border-top-left-radius: 16rem 1rem;
     border-top-right-radius: 1rem 12rem;
   }
-  .paper-slip:nth-child(3n+3) {
+  .paper-slip:nth-child(3n + 3) {
     border-bottom-left-radius: 1.4rem 12rem;
     border-bottom-right-radius: 1.2rem 16rem;
     border-top-left-radius: 1rem 16rem;
     border-top-right-radius: 8rem 2rem;
+  }
+  /* .editor-line:first-child {
+    background-color: #990000 !important;
+  } */
+  .editor-line:not(:first-child)::before {
+    content: '';
+    @apply absolute top-0 left-0 right-14 border-b border-gray-400/50 border-dashed;
+  }
+  .editor-line:not(:first-child)::after {
+    content: '';
+    @apply absolute top-0 right-0 w-4 border-b border-gray-400/50 border-dashed;
   }
 }

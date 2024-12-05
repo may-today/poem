@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import {
   DndContext,
   KeyboardSensor,
@@ -8,28 +8,35 @@ import {
   DragOverlay,
   pointerWithin,
 } from '@dnd-kit/core'
-import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import type { DragStartEvent, DragOverEvent, DragEndEvent } from '@dnd-kit/core'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { debounce } from '@/utils/scheduled'
-import { LINEID_NEWLINE_BEFORE, LINEID_NEWLINE_AFTER, LINEID_INITIAL, preserveLineIds } from '@/utils/constants'
+import { LINEID_NEWLINE_BEFORE, LINEID_NEWLINE_AFTER, LINEID_TRASH } from '@/utils/constants'
+import {
+  lineIdListAtom,
+  lineWordListMapAtom,
+  addNewLineAtom,
+  moveWordToExistingLineAtom,
+  wordMoveInlineAtom,
+  deleteWordFromLineAtom,
+} from '@/stores/poem'
 // import { startConfetti } from '@/utils/anims'
 import PoemEditorLine from './PoemEditorLine'
 import PoemEditorNewLine from './PoemEditorNewLine'
 import PoemPaperSlip from './PoemPaperSlip'
-
-const genRandomLineId = () => {
-  return `line:${Math.random().toString(36).substring(2, 15)}`
-}
+import PoemEditorTrashArea from './PoemEditorTrashArea'
+// import DebugPanel from './DebugPanel'
 
 const PoemEditor: React.FC = () => {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [activeLine, setActiveLine] = useState<string | null>(null)
-  const initialNewLineId = genRandomLineId()
-  const [items, setItems] = useState<Record<string, string[]>>({
-    [initialNewLineId]: [],
-  })
-  const [lineIds, setLineIds] = useState<string[]>([initialNewLineId])
-
+  const lineIdList = useAtomValue(lineIdListAtom)
+  const lineWordListMap = useAtomValue(lineWordListMapAtom)
+  const addNewLine = useSetAtom(addNewLineAtom)
+  const moveWordToExistingLine = useSetAtom(moveWordToExistingLineAtom)
+  const wordMoveInline = useSetAtom(wordMoveInlineAtom)
+  const deleteWordFromLine = useSetAtom(deleteWordFromLineAtom)
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -38,13 +45,10 @@ const PoemEditor: React.FC = () => {
   )
 
   const findLineId = (id: string) => {
-    if (id.startsWith('line:')) {
+    if (id.startsWith('L:')) {
       return id
     }
-    if (initialItems.includes(id)) {
-      return LINEID_INITIAL
-    }
-    return Object.keys(items).find((key) => items[key].includes(id))
+    return Object.keys(lineWordListMap).find((key) => lineWordListMap[key].includes(id))
   }
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -55,48 +59,12 @@ const PoemEditor: React.FC = () => {
     if (!event.over) {
       return
     }
-    const activeId = event.active.id as string
     const overId = event.over.id as string
-    const prevLineId = findLineId(activeId)
     const overLineId = findLineId(overId)
-    console.log('prevLineId', prevLineId, activeId)
-    console.log('overLineId', overLineId, overId)
     if (overLineId) {
       setActiveLine(overLineId)
-    }
-    if (!prevLineId || !overLineId || prevLineId === overLineId) {
       return
     }
-    if (preserveLineIds.includes(overLineId)) {
-      return
-    }
-    if (preserveLineIds.includes(prevLineId)) {
-      return
-    }
-    // if (prevLineId === LINEID_INITIAL) {
-    //   setInitialItems((prev) => [...prev.filter((item) => item !== activeId)])
-    // }
-    setItems((prev) => {
-      const prevActiveItems = prev[prevLineId] || []
-      const prevOverItems = prev[overLineId] || []
-      const prevActiveIndex = prevActiveItems.indexOf(activeId)
-      const prevOverIndex = prevOverItems.indexOf(overId)
-      if (prevLineId === LINEID_INITIAL) {
-        return {
-          ...prev,
-          [overLineId]: [...prevOverItems, activeId],
-        }
-      }
-      return {
-        ...prev,
-        [prevLineId]: [...prevActiveItems.filter((item) => item !== activeId)],
-        [overLineId]: [
-          ...prevOverItems.slice(0, prevOverIndex),
-          prevActiveItems[prevActiveIndex],
-          ...prevOverItems.slice(prevOverIndex, prevOverItems.length),
-        ],
-      }
-    })
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -105,71 +73,43 @@ const PoemEditor: React.FC = () => {
     if (!event.over) {
       return
     }
-    const activeId = event.active.id as string
+    const wordId = event.active.id as string
     const overId = event.over.id as string
-    const prevLineId = findLineId(activeId)
+    const prevLineId = findLineId(wordId)
     const overLineId = findLineId(overId)
+    if (!prevLineId || !overLineId) {
+      return
+    }
     if (overLineId === LINEID_NEWLINE_BEFORE) {
-      generateNewLine('before')
+      const newLineId = addNewLine(0)
+      moveWordToExistingLine(wordId, prevLineId, newLineId)
       return
     }
     if (overLineId === LINEID_NEWLINE_AFTER) {
-      generateNewLine('after')
+      const newLineId = addNewLine(lineIdList.length)
+      moveWordToExistingLine(wordId, prevLineId, newLineId)
       return
     }
-    if (prevLineId === LINEID_INITIAL && overLineId && !preserveLineIds.includes(overLineId)) {
-      // move to a new line
-      // setInitialItems((prev) => [...prev.filter((item) => item !== activeId)])
-      setItems((prev) => {
-        return {
-          ...prev,
-          [overLineId]: [...(prev[overLineId] || []), activeId],
-        }
-      })
+    if (overLineId.endsWith(':BEFORE')) {
+      const targetLineId = overLineId.replace(':BEFORE', '')
+      const newLineId = addNewLine(targetLineId)
+      moveWordToExistingLine(wordId, prevLineId, newLineId)
       return
     }
-    if (!prevLineId || !overLineId || prevLineId !== overLineId) {
+    if (overLineId === LINEID_TRASH) {
+      deleteWordFromLine(prevLineId, wordId)
       return
     }
-    const activeIndex = items[overLineId].indexOf(activeId)
-    const overIndex = items[overLineId].indexOf(overId)
-    if (activeIndex !== overIndex) {
-      setItems((prev) => {
-        // delete empty line
-        // biome-ignore lint/complexity/noForEach: <explanation>
-        Object.keys(prev).forEach((key) => {
-          // if (prev[key].length === 0) {
-          //   delete prev[key]
-          // }
-        })
-        return {
-          ...prev,
-          [overLineId]: arrayMove(items[overLineId], activeIndex, overIndex),
-        }
-      })
+    if (prevLineId !== overLineId) {
+      moveWordToExistingLine(wordId, prevLineId, overLineId)
+      return
     }
+    wordMoveInline(overLineId, wordId, overId)
   }
 
-  const generateNewLine = (type: 'before' | 'after') => {
-    const newLineId = genRandomLineId()
-    if (type === 'before') {
-      setLineIds((prev) => [newLineId, ...prev])
-      setItems((prev) => {
-        return {
-          ...prev,
-          [newLineId]: [],
-        }
-      })
-    } else {
-      setLineIds((prev) => [...prev, newLineId])
-      setItems((prev) => {
-        return {
-          ...prev,
-          [newLineId]: [],
-        }
-      })
-    }
-    return newLineId
+  const handleDragCancel = () => {
+    setActiveId(null)
+    setActiveLine(null)
   }
 
   return (
@@ -180,18 +120,24 @@ const PoemEditor: React.FC = () => {
         onDragStart={handleDragStart}
         onDragOver={debounce(handleDragOver, 150)}
         onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+        autoScroll
       >
         <PoemEditorNewLine id={LINEID_NEWLINE_BEFORE} hover={activeLine === LINEID_NEWLINE_BEFORE} />
-        {lineIds.map((lineId, index) => (
-          <PoemEditorLine
-            key={lineId}
-            id={lineId}
-            index={index}
-            items={items[lineId] || []}
-            hover={activeLine === lineId}
-          />
-        ))}
+        <div>
+          {lineIdList.map((lineId, index) => (
+            <PoemEditorLine
+              key={lineId}
+              id={lineId}
+              index={index}
+              items={lineWordListMap[lineId] || []}
+              hover={activeLine === lineId}
+              beforeButtonHover={activeLine === `${lineId}:BEFORE`}
+            />
+          ))}
+        </div>
         <PoemEditorNewLine id={LINEID_NEWLINE_AFTER} hover={activeLine === LINEID_NEWLINE_AFTER} />
+        <PoemEditorTrashArea id={LINEID_TRASH} hover={activeLine === LINEID_TRASH} />
         <DragOverlay>{activeId ? <PoemPaperSlip id={activeId.toString()} /> : null}</DragOverlay>
       </DndContext>
     </div>

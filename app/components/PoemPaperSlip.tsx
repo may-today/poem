@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
 import { useAtomValue } from 'jotai'
 import { wordByIdAtom } from '@/stores/data'
+import clsx from 'clsx'
 
 interface PoemPaperSlipProps {
   id: string
+  active?: boolean
   onClick?: () => void
 }
 
@@ -24,7 +26,10 @@ const PoemPaperSlip: React.FC<PoemPaperSlipProps> = (props) => {
   return (
     <div
       style={{ transform: randomRotation }}
-      className="paper-slip"
+      className={clsx([
+        'paper-slip',
+        props.active ? 'bg-black/5' : '',
+      ])}
       onClick={props.onClick}
       onKeyDown={handleKeyDown}
     >

@@ -1,7 +1,10 @@
 const Header: React.FC = () => {
   return (
-    <div className="py-6 md:px-1 px-4">
-      <h1 className="text-xl">Ashin Re.Poem</h1>
+    <div className="py-4 md:px-1 px-4 leading-none">
+      <h1 className="text-lg">Mayday</h1>
+      <h2 className="text-lg -mt-2">
+        <span className="text-sky-700 font-bold">Re.</span>Poem 拼贴诗
+      </h2>
     </div>
   )
 }
