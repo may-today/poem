@@ -7,7 +7,7 @@ import { toPng } from 'html-to-image'
 import PoemRenderer from '@/components/PoemRenderer/PoemRenderer'
 import { startConfetti } from '@/utils/anims'
 import { selectedWordsAtom } from '@/stores/poem'
-import Footer from './Footer'
+import Footer from '@/components/Footer'
 
 export default function Result() {
   const ref = useRef<HTMLDivElement>(null)
@@ -32,7 +32,7 @@ export default function Result() {
     toPng(ref.current, { cacheBust: true })
       .then((dataUrl) => {
         const link = document.createElement('a')
-        link.download = 'my-image-name.png'
+        link.download = 'mayday-poem.png'
         link.href = dataUrl
         link.click()
       })

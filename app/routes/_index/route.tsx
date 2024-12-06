@@ -9,6 +9,7 @@ import PoemEditorSlipPanel from '@/components/PoemEditor/PoemEditorSlipPanel'
 import { prepareData, refreshRandomWordIdList } from '@/stores/data'
 import { resetStateAtom } from '@/stores/poem'
 import PoemEditorInitialBox from '@/components/PoemEditor/PoemEditorInitialBox'
+import Footer from '@/components/Footer'
 
 export default function Index() {
   const navigate = useNavigate()
@@ -44,7 +45,7 @@ export default function Index() {
           <div className="flex-1 overflow-auto">
             <PoemEditorInitialBox animated={!isMediumDevice} />
           </div>
-          <div className="flex justify-between gap-2 px-4 pt-2 mt-2 border-t border-gray-400/20">
+          <div className="flex justify-between gap-2 px-4 md:px-0 pt-2 mt-2 border-t border-gray-400/20">
             <button className="button button-ghost danger" onClick={setResetStateAtom} type="button">
               重置
             </button>
@@ -60,7 +61,7 @@ export default function Index() {
           </div>
         </div>
       </div>
-      {/* <Footer /> */}
+      {isMediumDevice && <Footer />}
     </>
   )
 }
