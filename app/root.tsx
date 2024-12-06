@@ -16,6 +16,7 @@ export const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#aadfef" />
+        <link rel="icon" href="/favicon.svg" />
         <Meta />
         <Links />
       </head>
@@ -56,7 +57,7 @@ const App: React.FC = () => {
 export const HydrateFallback = () => {
   return (
     <div className="w-full h-full flex items-center justify-center">
-      <p>Loading</p>
+      <span className="global-loader" />
     </div>
   )
 }
