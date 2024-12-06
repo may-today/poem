@@ -1,4 +1,6 @@
 import { atom } from 'jotai'
+import songSlugMap from '@/dict/songSlugMap.json'
+import { getSongNameById } from '@/utils/data'
 
 const genRandomLineId = () => {
   return `L:${Math.random().toString(36).substring(2, 8)}`
@@ -12,6 +14,25 @@ export const lineWordListMapAtom = atom<Record<string, string[]>>({
   [initialLineId]: [],
 })
 
+export const resetStateAtom = atom(null, (get, set) => {
+  set(selectedWordsAtom, [])
+  set(lineIdListAtom, [initialLineId])
+  set(lineWordListMapAtom, {
+    [initialLineId]: [],
+  })
+})
+export const selectedSongsAtom = atom((get) => {
+  const selectedWords = get(selectedWordsAtom)
+  // words: ${songId}:${number}
+  // sort by count
+  const songIdCoundMap = {} as Record<string, number>
+  for (const word of selectedWords) {
+    const [songId] = word.split(':')
+    songIdCoundMap[songId] = (songIdCoundMap[songId] || 0) + 1
+  }
+  const songIdList = Object.keys(songIdCoundMap).sort((a, b) => songIdCoundMap[b] - songIdCoundMap[a])
+  return songIdList.map((songId) => getSongNameById(songId))
+})
 export const isInSelectedWordsAtom = atom((get) => (wordId: string) => get(selectedWordsAtom).includes(wordId))
 export const addNewLineAtom = atom(null, (get, set, insertBefore: number | string) => {
   const lineId = genRandomLineId()
@@ -48,7 +69,7 @@ export const moveWordToExistingLineAtom = atom(
       [sourceLineId]: newSourceLineWordList,
       [targetLineId]: newTargetLineWordList,
     }
-    if (newSourceLineWordList.length === 0) {
+    if (newSourceLineWordList.length === 0 && lineIdList.length > 1) {
       delete newLineWordListMap[sourceLineId]
       set(
         lineIdListAtom,
@@ -79,7 +100,7 @@ export const deleteWordFromLineAtom = atom(null, (get, set, lineId: string, word
   const lineWordListMap = get(lineWordListMapAtom)
   const newTargetLineWordList = lineWordListMap[lineId].filter((id) => id !== wordId)
   const newLineWordListMap = { ...lineWordListMap, [lineId]: newTargetLineWordList }
-  if (newTargetLineWordList.length === 0) {
+  if (newTargetLineWordList.length === 0 && lineIdList.length > 1) {
     delete newLineWordListMap[lineId]
     set(
       lineIdListAtom,
@@ -87,5 +108,8 @@ export const deleteWordFromLineAtom = atom(null, (get, set, lineId: string, word
     )
   }
   set(lineWordListMapAtom, newLineWordListMap)
-  set(selectedWordsAtom, get(selectedWordsAtom).filter((id) => id !== wordId))
+  set(
+    selectedWordsAtom,
+    get(selectedWordsAtom).filter((id) => id !== wordId)
+  )
 })

@@ -80,9 +80,26 @@
 }
 
 @layer components {
+  .button {
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap;
+    @apply px-4 py-2 rounded-full font-medium;
+    @apply focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+  }
+  .button.button-small {
+    @apply px-3 py-1 text-sm;
+  }
+  .button.button-normal {
+    @apply transition-colors bg-white shadow hover:bg-gray-200/90;
+  }
+  .button.button-ghost {
+    @apply border border-gray-400/50 hover:bg-black/10;
+  }
+  .button.button-ghost.danger {
+    @apply border border-dashed border-red-400/50 hover:bg-red-400/10 text-red-400;
+  }
   .paper-slip {
     @apply inline-flex justify-center items-center bg-white px-2 h-8 m-1 shadow-sm;
-    @apply select-none cursor-grab active:cursor-grabbing transition-all duration-300 touch-none;
+    @apply select-none transition-all duration-300;
   }
   .paper-slip:nth-child(3n + 1) {
     border-bottom-left-radius: 10rem 1rem;
@@ -102,9 +119,6 @@
     border-top-left-radius: 1rem 16rem;
     border-top-right-radius: 8rem 2rem;
   }
-  /* .editor-line:first-child {
-    background-color: #990000 !important;
-  } */
   .editor-line:not(:first-child)::before {
     content: '';
     @apply absolute top-0 left-0 right-14 border-b border-gray-400/50 border-dashed;
@@ -112,5 +126,29 @@
   .editor-line:not(:first-child)::after {
     content: '';
     @apply absolute top-0 right-0 w-4 border-b border-gray-400/50 border-dashed;
+  }
+  .renderer-container {
+    @apply flex flex-col items-stretch gap-2 w-80 bg-[#eeeeee];
+  }
+  .renderer-container.renderer-container-1 {
+    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+  }
+  .renderer-container.renderer-container-2 {
+    background-image: linear-gradient(to top, #a8edea 0%, #fed6e3 100%);
+  }
+  .renderer-container.renderer-container-3 {
+    background-image: linear-gradient(to top, #ebc0fd 0%, #d9ded8 100%);
+  }
+  .renderer-container.renderer-container-4 {
+    background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  }
+  .renderer-container.renderer-container-5 {
+    background-color: #dcd9d4;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%),
+      radial-gradient(at 50% 0%, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.5) 50%);
+    background-blend-mode: soft-light, screen;
+  }
+  .renderer-container.renderer-container-6 {
+    background-image: linear-gradient(to top, #fff1eb 0%, #ace0f9 100%);
   }
 }

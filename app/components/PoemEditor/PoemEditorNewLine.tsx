@@ -14,7 +14,7 @@ const PoemEditorNewLine: React.FC<PoemEditorNewLineProps> = (props) => {
     <div
       ref={setNodeRef}
       className={clsx([
-        'flex justify-center items-center h-10 gap-1',
+        'flex justify-center items-center h-10 w-full gap-1',
         'border border-gray-400/50 border-dashed transition-colors',
         props.hover ? 'bg-black/5' : '',
       ])}

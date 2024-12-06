@@ -12,7 +12,7 @@ const PoemEditorTrashArea: React.FC<{
     <div
       ref={setNodeRef}
       className={clsx([
-        'flex justify-center items-center h-12 mt-2',
+        'flex justify-center items-center h-12 w-20 mt-4',
         'border border-red-400/50 border-dashed transition-colors',
         props.hover ? 'bg-red-400/5' : '',
       ])}

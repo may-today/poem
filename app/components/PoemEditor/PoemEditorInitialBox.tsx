@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { randomWordIdListAtom } from '@/stores/data'
 import { importWordToLastLineAtom, isInSelectedWordsAtom } from '@/stores/poem'
-import PoemPaperSlip from './PoemPaperSlip'
+import PoemPaperSlip from '../PoemPaperSlip'
 import { InfiniteSlider } from '@/components/motion-ui/infinite-slider'
 
 const PoemEditorInitialBox: React.FC<{
@@ -11,7 +11,7 @@ const PoemEditorInitialBox: React.FC<{
   const randomWordIdList = useAtomValue(randomWordIdListAtom)
   const isInSelectedWords = useAtomValue(isInSelectedWordsAtom)
   const importWordToLastLine = useSetAtom(importWordToLastLineAtom)
-  const groupList = generateGroupList(randomWordIdList, 5)
+  const groupList = generateGroupList(randomWordIdList, 4)
   const container = document.getElementById('scroll-container')
 
   return (
@@ -42,7 +42,7 @@ const PoemEditorInitialBox: React.FC<{
           id={wordId}
           active={isInSelectedWords(wordId)}
           onClick={() => {
-            importWordToLastLine(wordId)
+            !isInSelectedWords(wordId) && importWordToLastLine(wordId)
             container?.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
           }}
         />

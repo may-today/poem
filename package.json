@@ -20,6 +20,7 @@
     "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "html-to-image": "^1.11.11",
     "isbot": "^4",
     "jotai": "^2.10.3",
     "lucide-react": "^0.465.0",

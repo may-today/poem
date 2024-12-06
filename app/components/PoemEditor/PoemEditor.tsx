@@ -21,10 +21,9 @@ import {
   wordMoveInlineAtom,
   deleteWordFromLineAtom,
 } from '@/stores/poem'
-// import { startConfetti } from '@/utils/anims'
 import PoemEditorLine from './PoemEditorLine'
 import PoemEditorNewLine from './PoemEditorNewLine'
-import PoemPaperSlip from './PoemPaperSlip'
+import PoemPaperSlip from '../PoemPaperSlip'
 import PoemEditorTrashArea from './PoemEditorTrashArea'
 // import DebugPanel from './DebugPanel'
 
@@ -113,7 +112,7 @@ const PoemEditor: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col items-center">
       <DndContext
         sensors={sensors}
         collisionDetection={pointerWithin}
@@ -124,7 +123,7 @@ const PoemEditor: React.FC = () => {
         autoScroll
       >
         <PoemEditorNewLine id={LINEID_NEWLINE_BEFORE} hover={activeLine === LINEID_NEWLINE_BEFORE} />
-        <div>
+        <div className="w-full">
           {lineIdList.map((lineId, index) => (
             <PoemEditorLine
               key={lineId}

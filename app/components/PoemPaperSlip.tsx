@@ -29,6 +29,7 @@ const PoemPaperSlip: React.FC<PoemPaperSlipProps> = (props) => {
       className={clsx([
         'paper-slip',
         props.active ? 'bg-black/5' : '',
+        props.onClick ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing touch-none',
       ])}
       onClick={props.onClick}
       onKeyDown={handleKeyDown}

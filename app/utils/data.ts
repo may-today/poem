@@ -25,3 +25,7 @@ export const getWordIdFlattenMap = (slugMap: SlugMap) => {
   }
   return wordIdMap
 }
+
+export const getSongNameById = (songId: string) => {
+  return Object.keys(songSlugMap).find((name) => (songSlugMap as Record<string, string>)[name] === songId)
+}

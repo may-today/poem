@@ -1,15 +1,15 @@
 import { SortableContext } from '@dnd-kit/sortable'
 import { useDroppable } from '@dnd-kit/core'
 import clsx from 'clsx'
-import PoemPaperSortableSlip from './PoemPaperSortableSlip'
+import PoemPaperSortableSlip from '../PoemPaperSortableSlip'
 import { Plus } from 'lucide-react'
 
 interface PoemEditorLineProps {
   id: string
   items: string[]
   index: number
-  hover: boolean
-  beforeButtonHover: boolean
+  hover?: boolean
+  beforeButtonHover?: boolean
 }
 
 const PoemEditorLine: React.FC<PoemEditorLineProps> = (props) => {
@@ -21,7 +21,7 @@ const PoemEditorLine: React.FC<PoemEditorLineProps> = (props) => {
       <div
         ref={setNodeRef}
         className={clsx([
-          'editor-line relative flex justify-start flex-wrap min-h-14 px-2 py-3',
+          'editor-line relative flex justify-start flex-wrap min-h-14 w-full px-2 py-3',
           'border border-t-0 border-b-0 border-gray-400/50 border-dashed transition-colors',
           props.hover ? 'bg-black/5' : '',
         ])}
