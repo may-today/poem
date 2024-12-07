@@ -1,18 +1,20 @@
 import { useEffect, useCallback, useRef } from 'react'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, ChevronDown } from 'lucide-react'
 import { useAtomValue } from 'jotai'
 import clsx from 'clsx'
 import { useNavigate } from '@remix-run/react'
 import { toPng } from 'html-to-image'
-import PoemRenderer from '@/components/PoemRenderer/PoemRenderer'
 import { startConfetti } from '@/utils/anims'
-import { selectedWordsAtom } from '@/stores/poem'
+import { selectedWordsAtom, selectedSongsAtom } from '@/stores/poem'
+import { Disclosure, DisclosureContent, DisclosureTrigger } from '@/components/motion-ui/disclosure'
+import PoemRenderer from '@/components/PoemRenderer/PoemRenderer'
 import Footer from '@/components/Footer'
 
 export default function Result() {
   const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const selectedWords = useAtomValue(selectedWordsAtom)
+  const selectedSongs = useAtomValue(selectedSongsAtom)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
@@ -46,6 +48,23 @@ export default function Result() {
       <div className={clsx(['flex-1 flex flex-col items-center gap-4 h-full overflow-auto'])}>
         <div className="bg-white p-2 shadow-sm">
           <PoemRenderer ref={ref} />
+        </div>
+        <div>
+          <Disclosure className="w-80 rounded-md border border-zinc-200 px-3 dark:border-zinc-700">
+            <DisclosureTrigger>
+              <button className="w-full py-2 text-sm flex items-center justify-between opacity-60" type="button">
+                完整引用列表 ({selectedSongs.length})
+                <ChevronDown size={16} strokeWidth={1.5} />
+              </button>
+            </DisclosureTrigger>
+            <DisclosureContent>
+              <div className="pb-2">
+                {selectedSongs.length > 3 && (
+                  <p className="text-xs text-black/30">{selectedSongs.map((name) => `《${name}》`).join('')}</p>
+                )}
+              </div>
+            </DisclosureContent>
+          </Disclosure>
         </div>
         <div className="flex gap-2">
           <button className="button button-normal" onClick={() => navigate('/')} type="button">
