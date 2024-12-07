@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
         衍生作品在未获得著作权人许可的情况下
       </div>
       <div className="text-center">
-        不得以商业、营销、出版或其他非盈利用途使用
+        不得以商业、营销、出版或其他盈利用途使用
       </div>
       <div className="text-center">
         <span>
