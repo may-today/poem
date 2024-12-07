@@ -8,7 +8,7 @@ const PoemRenderFooter: React.FC = () => {
   if (selectedSongs.length === 1)
     return (
       <div className="flex flex-col items-end z-10 bg-white/50 text-xs text-black/30 px-2 py-4">
-        <p>来自五月天《{selectedSongs[0]}》的摇滚诗</p>
+        <p className="w-[60%] text-right">来自五月天《{selectedSongs[0]}》的摇滚诗</p>
       </div>
     )
   if (selectedSongs.length <= 3)
