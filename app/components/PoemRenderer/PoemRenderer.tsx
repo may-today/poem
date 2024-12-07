@@ -9,19 +9,19 @@ const PoemRenderer = forwardRef<HTMLDivElement>((props, ref) => {
   const lineIdList = useAtomValue(lineIdListAtom)
   const lineWordListMap = useAtomValue(lineWordListMapAtom)
   const randomContainerStyleClass = useMemo(() => {
-    const styleId = Math.floor(Math.random() * 6) + 1
+    const styleId = Math.floor(Math.random() * 17) + 1
     return `renderer-container-${styleId}`
   }, [])
 
   return (
     <div className={clsx(['renderer-container relative', randomContainerStyleClass])} ref={ref}>
-      <div className="p-2">
+      <div className="p-2 z-10">
         {lineIdList.map((lineId, index) => (
           <PoemRendererLine key={lineId} id={lineId} index={index} items={lineWordListMap[lineId] || []} />
         ))}
       </div>
       <PoemRendererFooter />
-      <div className="absolute inset-0" />
+      <div className="absolute inset-0 z-20" />
     </div>
   )
 })
