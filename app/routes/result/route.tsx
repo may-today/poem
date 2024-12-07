@@ -49,23 +49,23 @@ export default function Result() {
         <div className="bg-white p-2 shadow-sm">
           <PoemRenderer ref={ref} />
         </div>
-        <div>
-          <Disclosure className="w-80 rounded-md border border-zinc-200 px-3 dark:border-zinc-700">
-            <DisclosureTrigger>
-              <button className="w-full py-2 text-sm flex items-center justify-between opacity-60" type="button">
-                完整引用列表 ({selectedSongs.length})
-                <ChevronDown size={16} strokeWidth={1.5} />
-              </button>
-            </DisclosureTrigger>
-            <DisclosureContent>
-              <div className="pb-2">
-                {selectedSongs.length > 3 && (
+        {selectedSongs.length > 3 && (
+          <div>
+            <Disclosure className="w-80 rounded-md border border-zinc-200 px-3 dark:border-zinc-700">
+              <DisclosureTrigger>
+                <button className="w-full py-2 text-sm flex items-center justify-between opacity-60" type="button">
+                  完整引用列表 ({selectedSongs.length})
+                  <ChevronDown size={16} strokeWidth={1.5} />
+                </button>
+              </DisclosureTrigger>
+              <DisclosureContent>
+                <div className="pb-2">
                   <p className="text-xs text-black/30">{selectedSongs.map((name) => `《${name}》`).join('')}</p>
-                )}
-              </div>
-            </DisclosureContent>
-          </Disclosure>
-        </div>
+                </div>
+              </DisclosureContent>
+            </Disclosure>
+          </div>
+        )}
         <div className="flex gap-2">
           <button className="button button-normal" onClick={() => navigate('/')} type="button">
             <ChevronLeft size={16} strokeWidth={1.5} />
