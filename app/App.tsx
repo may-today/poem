@@ -4,6 +4,22 @@ import wordMap from './dict/wordMap.json'
 
 type Word = { id: string; text: string; song: string }
 
+type MiniToolBridge = {
+  postNote(options: {
+    title?: string
+    content?: string
+    pageType?: 'video_publish' | 'photo_publish' | 'slides_edit'
+    mediaInfo: { image_resources: { url: string }[] }
+  }): Promise<unknown>
+  saveImageToPhotosAlbum(options: { filePath: string }): Promise<unknown>
+}
+
+declare global {
+  interface Window {
+    xhs?: { miniTool?: MiniToolBridge }
+  }
+}
+
 const allWords: Word[] = Object.entries(wordMap).flatMap(([song, words]) =>
   words.map((text, index) => ({
     id: `${(songSlugMap as Record<string, string>)[song] ?? 'unknown'}:${index}`,
@@ -35,6 +51,7 @@ export default function App() {
   const [selected, setSelected] = useState<Word[]>([])
   const [query, setQuery] = useState('')
   const [preview, setPreview] = useState(false)
+  const [busy, setBusy] = useState(false)
 
   const candidates = useMemo(() => {
     const keyword = query.trim()
@@ -65,7 +82,7 @@ export default function App() {
     setPreview(false)
   }
 
-  const download = () => {
+  const renderPoemImage = () => {
     const poemLines = lines.filter((line) => line.length).map((line) => line.map((word) => word.text).join(''))
     const width = 1080
     const padding = 104
@@ -73,7 +90,7 @@ export default function App() {
     const canvas = document.createElement('canvas')
     canvas.width = width
     const context = canvas.getContext('2d')
-    if (!context) return
+    if (!context) return null
 
     context.font = '48px system-ui, sans-serif'
     const renderedLines = poemLines.flatMap((line) => {
@@ -101,16 +118,43 @@ export default function App() {
     context.fillText('Mayday Re.Poem', padding, height - 126)
     context.fillText(`来自五月天 ${songs.slice(0, 4).map((song) => `《${song}》`).join('')}${songs.length > 4 ? `等 ${songs.length} 首歌` : ''}`, padding, height - 76)
 
-    const link = document.createElement('a')
-    link.download = 'mayday-repoem.png'
-    link.href = canvas.toDataURL('image/png')
-    link.click()
+    return canvas.toDataURL('image/png')
   }
 
-  const share = async () => {
+  const withMiniTool = async (action: (bridge: MiniToolBridge) => Promise<unknown>) => {
+    const bridge = window.xhs?.miniTool
+    if (!bridge) {
+      alert('请在小红书小工具容器中使用此功能')
+      return
+    }
+
+    setBusy(true)
+    try {
+      await action(bridge)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '操作失败，请稍后重试'
+      alert(message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const saveImage = async () => {
+    const image = renderPoemImage()
+    if (!image) return
+    await withMiniTool((bridge) => bridge.saveImageToPhotosAlbum({ filePath: image }))
+  }
+
+  const publishNote = async () => {
     const text = lines.filter((line) => line.length).map((line) => line.map((word) => word.text).join('')).join('\n')
-    if (navigator.share) await navigator.share({ title: 'Mayday Re.Poem', text })
-    else await navigator.clipboard.writeText(text)
+    const image = renderPoemImage()
+    if (!image) return
+    await withMiniTool((bridge) => bridge.postNote({
+      title: 'Mayday Re.Poem',
+      content: text.slice(0, 1000),
+      pageType: 'photo_publish',
+      mediaInfo: { image_resources: [{ url: image }] },
+    }))
   }
 
   return (
@@ -136,9 +180,9 @@ export default function App() {
             </footer>
           </article>
           <div className="action-row">
-            <button className="secondary-button" onClick={() => setPreview(false)}>继续编辑</button>
-            <button className="secondary-button" onClick={share}>分享文字</button>
-            <button className="primary-button" onClick={download}>保存图片</button>
+            <button className="secondary-button" disabled={busy} onClick={() => setPreview(false)}>继续编辑</button>
+            <button className="secondary-button" disabled={busy} onClick={publishNote}>发布笔记</button>
+            <button className="primary-button" disabled={busy} onClick={saveImage}>保存图片</button>
           </div>
         </section>
       ) : (

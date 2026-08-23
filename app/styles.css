@@ -6,8 +6,9 @@
 }
 
 * { box-sizing: border-box; }
-html { background: #deddd8; }
+html { background: #deddd8; touch-action: manipulation; }
 body { margin: 0; min-width: 320px; min-height: 100vh; }
+body { -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
 button, input { font: inherit; }
 button { color: inherit; }
 
@@ -17,7 +18,7 @@ button { color: inherit; }
   min-height: 100svh;
   margin: 0 auto;
   background: #f5f4f0;
-  padding: env(safe-area-inset-top) 18px calc(88px + env(safe-area-inset-bottom));
+  padding: var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) 18px calc(88px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
 }
 
 .topbar { display: flex; align-items: center; justify-content: space-between; padding: 20px 2px 18px; border-bottom: 1px solid #d8d6d0; }
@@ -44,14 +45,15 @@ h1 span { color: #167a99; }
 
 .word-bank input { width: 100%; height: 42px; margin-bottom: 10px; padding: 0 13px; border: 1px solid #d2d0c9; border-radius: 5px; outline: none; background: #fff; color: #1e1e1c; font-size: 14px; }
 .word-bank input:focus { border-color: #167a99; }
-.words { margin: 0 -4px; }
+.words { margin: 0 -4px; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
 
-.bottom-bar { position: fixed; z-index: 10; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between; width: min(100%, 480px); margin: 0 auto; padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid #d8d6d0; background: rgb(245 244 240 / 96%); }
+.bottom-bar { position: fixed; z-index: 10; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between; width: min(100%, 480px); margin: 0 auto; padding: 12px 20px calc(12px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))); border-top: 1px solid #d8d6d0; background: rgb(245 244 240 / 96%); }
 .bottom-bar span { color: #85827a; font-size: 12px; }
 .primary-button, .secondary-button { min-height: 42px; border-radius: 5px; padding: 0 18px; cursor: pointer; }
 .primary-button { border: 1px solid #1e1e1c; background: #1e1e1c; color: #fff; }
 .primary-button:disabled { border-color: #c8c6c0; background: #c8c6c0; cursor: default; }
 .secondary-button { border: 1px solid #cbc8c0; background: transparent; }
+.secondary-button:disabled { color: #aaa8a2; cursor: default; }
 
 .preview-screen { padding-top: 24px; }
 .poem-card { display: flex; flex-direction: column; min-height: 480px; padding: 26px 24px 22px; border: 1px solid #d1cec5; background: #eeede8; }
