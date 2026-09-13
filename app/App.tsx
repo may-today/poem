@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useReducer } from 'react'
 import songSlugMap from './dict/songSlugMap.json'
 import wordMap from './dict/wordMap.json'
 
-type Word = { id: string; text: string; song: string }
+import PoemEditor from './PoemEditor'
+import { initialHistory, poemReducer, type Word } from './poem-state'
 
 const allWords: Word[] = Object.entries(wordMap).flatMap(([song, words]) =>
   words.map((text, index) => ({
@@ -21,20 +22,43 @@ const sample = (items: Word[], count = 36) => {
   return copy.slice(0, count)
 }
 
-const splitLines = (selected: Word[]) => {
-  const lines: Word[][] = [[]]
-  selected.forEach((word) => {
-    if (word.id.startsWith('break:')) lines.push([])
-    else lines.at(-1)?.push(word)
-  })
-  return lines
-}
-
 export default function App() {
   const [suggestions, setSuggestions] = useState(() => sample(allWords))
-  const [selected, setSelected] = useState<Word[]>([])
+  const [history, dispatch] = useReducer(poemReducer, initialHistory)
+  const lines = history.present.lines
+  const selected = lines.flat()
   const [query, setQuery] = useState('')
   const [preview, setPreview] = useState(false)
+  const [libraryOpen, setLibraryOpen] = useState(false)
+  const [libraryQuery, setLibraryQuery] = useState('')
+  const [librarySong, setLibrarySong] = useState('')
+  const libraryRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    if (!libraryOpen) return
+    const dialog = libraryRef.current
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    dialog?.showModal()
+    return () => {
+      dialog?.close()
+      document.body.style.overflow = previousOverflow
+    }
+  }, [libraryOpen])
+
+  const libraryGroups = useMemo(() => {
+    const keyword = libraryQuery.trim()
+    const groups = new Map<string, Word[]>()
+    for (const word of allWords) {
+      if (librarySong && word.song !== librarySong) continue
+      if (keyword && !word.text.includes(keyword) && !word.song.includes(keyword)) continue
+      const words = groups.get(word.song) ?? []
+      words.push(word)
+      groups.set(word.song, words)
+    }
+    return [...groups.entries()]
+  }, [libraryQuery, librarySong])
+  const libraryCount = libraryGroups.reduce((count, [, words]) => count + words.length, 0)
 
   const candidates = useMemo(() => {
     const keyword = query.trim()
@@ -42,26 +66,13 @@ export default function App() {
     return allWords.filter((word) => word.text.includes(keyword) || word.song.includes(keyword)).slice(0, 80)
   }, [query, suggestions])
 
-  const lines = splitLines(selected)
   const selectedIds = new Set(selected.map((word) => word.id))
-  const songs = [...new Set(selected.filter((word) => !word.id.startsWith('break:')).map((word) => word.song))]
+  const songs = [...new Set(selected.map((word) => word.song))]
 
-  const addWord = (word: Word) => {
-    if (!selectedIds.has(word.id)) setSelected((current) => [...current, word])
-  }
-
-  const addBreak = () => {
-    if (selected.length && !selected.at(-1)?.id.startsWith('break:')) {
-      setSelected((current) => [...current, { id: `break:${crypto.randomUUID()}`, text: '', song: '' }])
-    }
-  }
-
-  const removeWord = (index: number) => {
-    setSelected((current) => current.filter((_, itemIndex) => itemIndex !== index))
-  }
+  const addWord = (word: Word) => dispatch({ type: 'add', word })
 
   const reset = () => {
-    setSelected([])
+    dispatch({ type: 'clear' })
     setPreview(false)
   }
 
@@ -143,25 +154,15 @@ export default function App() {
         </section>
       ) : (
         <>
-          <section className="editor" aria-label="诗歌编辑区">
-            <div className="section-heading">
-              <div><b>我的诗</b><small>点击词片可移除</small></div>
-              <button className="text-button" onClick={addBreak} disabled={!selected.length}>换行</button>
-            </div>
-            <div className="canvas">
-              {!selected.length && <p className="empty">从下方挑选词片，拼出你的诗。</p>}
-              {selected.map((word, index) => word.id.startsWith('break:') ? (
-                <button key={word.id} className="line-break" onClick={() => removeWord(index)} aria-label="移除换行">换行 ×</button>
-              ) : (
-                <button key={word.id} className="word selected-word" onClick={() => removeWord(index)}>{word.text}</button>
-              ))}
-            </div>
-          </section>
+          <PoemEditor history={history} dispatch={dispatch} />
 
           <section className="word-bank" aria-label="词片库">
             <div className="section-heading">
               <div><b>挑选词片</b><small>{query ? `找到 ${candidates.length} 个` : '每次随机出现一组'}</small></div>
-              <button className="text-button" onClick={() => { setQuery(''); setSuggestions(sample(allWords)) }}>换一组</button>
+              <div className="word-bank-actions">
+                <button className="text-button" onClick={() => setLibraryOpen(true)}>全部词片</button>
+                <button className="text-button" onClick={() => { setQuery(''); setSuggestions(sample(allWords)) }}>换一组</button>
+              </div>
             </div>
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索歌词或歌名" aria-label="搜索歌词或歌名" />
             <div className="words">
@@ -171,11 +172,46 @@ export default function App() {
             </div>
           </section>
           <div className="bottom-bar">
-            <span>{selected.filter((word) => !word.id.startsWith('break:')).length} 个词片</span>
-            <button className="primary-button" disabled={!selected.some((word) => !word.id.startsWith('break:'))} onClick={() => setPreview(true)}>完成</button>
+            <span>{selected.length} 个词片</span>
+            <button className="primary-button" disabled={!selected.length} onClick={() => setPreview(true)}>完成</button>
           </div>
         </>
       )}
+      <dialog ref={libraryRef} className="library-panel" aria-labelledby="library-title" onCancel={() => setLibraryOpen(false)} onClose={() => setLibraryOpen(false)}>
+        {libraryOpen && <>
+        <header className="library-header">
+          <div>
+            <h2 id="library-title">全部词片</h2>
+            <p>{allWords.length.toLocaleString()} 个词片 · {Object.keys(wordMap).length} 首歌</p>
+          </div>
+          <button className="text-button" onClick={() => setLibraryOpen(false)}>关闭</button>
+        </header>
+        <div className="library-filters">
+          <input autoFocus value={libraryQuery} onChange={(event) => setLibraryQuery(event.target.value)} placeholder="搜索歌词或歌名" aria-label="搜索全部词片" />
+          <select value={librarySong} onChange={(event) => setLibrarySong(event.target.value)} aria-label="按歌曲筛选">
+            <option value="">全部歌曲</option>
+            {Object.keys(wordMap).map((song) => <option key={song} value={song}>{song}</option>)}
+          </select>
+          <p className="library-result-count" role="status">{libraryGroups.length} 首歌 · {libraryCount.toLocaleString()} 个词片</p>
+        </div>
+        <div className="library-content">
+          {libraryGroups.length ? libraryGroups.map(([song, words]) => (
+            <section className="library-song" key={song} aria-label={song}>
+              <h3>{song}<span>{words.length} 个词片</span></h3>
+              <div className="words">
+                {words.map((word) => (
+                  <button key={word.id} className="word" disabled={selectedIds.has(word.id)} onClick={() => addWord(word)}>{word.text}</button>
+                ))}
+              </div>
+            </section>
+          )) : <p className="library-empty">没有找到匹配的词片，试试其他关键词或歌曲。</p>}
+        </div>
+        <footer className="library-footer">
+          <span role="status">已选 {selected.length} 个词片</span>
+          <button className="primary-button" onClick={() => setLibraryOpen(false)}>返回编辑</button>
+        </footer>
+        </>}
+      </dialog>
     </main>
   )
 }
