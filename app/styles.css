@@ -71,7 +71,8 @@ html {
   background-attachment: fixed;
   scroll-behavior: smooth;
 }
-body { position: relative; margin: 0; min-width: 320px; min-height: 100vh; }
+/* 与页面外壳使用同一小视口高度，避免移动端浏览器工具栏展开时撑出空白滚动区。 */
+body { position: relative; margin: 0; min-width: 320px; min-height: 100svh; }
 
 /* 纸张纹理 */
 body::before {
