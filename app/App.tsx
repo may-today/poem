@@ -79,12 +79,14 @@ export default function App() {
               </div>
             )}
           </div>
-          {isDesktop ? (
+          {isDesktop && (
             <aside className="workspace-bank">{bank}</aside>
-          ) : (
-            <BankSheet snap={sheet} onSnap={setSheet} count={selectedIds.size} onFinish={() => setPreview(true)} extra={<HistoryButtons history={history} dispatch={dispatch} />}>{bank}</BankSheet>
           )}
         </div>
+      )}
+      {/* 与顶栏同级，避免 .view 的入场动画将抽屉困在较低的层叠上下文中。 */}
+      {!preview && !isDesktop && (
+        <BankSheet snap={sheet} onSnap={setSheet} count={selectedIds.size} onFinish={() => setPreview(true)} extra={<HistoryButtons history={history} dispatch={dispatch} />}>{bank}</BankSheet>
       )}
       <WordLibraryDialog
         open={libraryOpen}
