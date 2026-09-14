@@ -96,8 +96,7 @@ export async function downloadPoem(lines: Word[][]) {
   link.click()
 }
 
-export async function sharePoem(lines: Word[][]) {
-  const text = poemText(lines).join('\n')
-  if (navigator.share) await navigator.share({ title: 'Mayday Re.Poem', text })
-  else await navigator.clipboard.writeText(text)
+export async function copyPoem(lines: Word[][]) {
+  const text = `${poemText(lines).join('\n')}\n\n${poemSourceText(lines)}`
+  await navigator.clipboard.writeText(text)
 }
