@@ -657,9 +657,8 @@ h1.logo {
   animation: line-in var(--dur-slow) var(--ease-out) both;
   animation-delay: calc(120ms + var(--i, 0) * 90ms);
 }
-.poem-card footer { display: flex; flex-direction: column; gap: 7px; color: var(--ink-3); font-size: 11px; letter-spacing: .04em; }
-.poem-card footer span { font-family: var(--font-poem); color: var(--ink-2); font-size: 12px; }
-.poem-card footer small { line-height: 1.6; }
+.poem-card footer { display: flex; flex-direction: column; align-self: flex-end; max-width: 80%; color: #b0b5ba; font-size: 12px; letter-spacing: .04em; text-align: right; overflow-wrap: anywhere; }
+.poem-card footer small { min-width: 0; font-size: inherit; line-height: 1.6; }
 .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
 .action-row .primary-button { grid-column: 1 / -1; }
 
