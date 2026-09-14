@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import type { Word } from '../poem-state'
 import { downloadPoem, sharePoem } from '../lib/poem-export'
 
@@ -11,7 +12,9 @@ export default function PoemPreview({ lines, onEdit }: Props) {
       <article className="poem-card" aria-label="诗歌预览">
         <p className="card-label">你的摇滚诗</p>
         <div className="poem-lines">
-          {lines.filter((line) => line.length).map((line, index) => <p key={index}>{line.map((word) => word.text).join('')}</p>)}
+          {lines.filter((line) => line.length).map((line, index) => (
+            <p key={index} style={{ '--i': index } as CSSProperties}>{line.map((word) => word.text).join('')}</p>
+          ))}
         </div>
         <footer>
           <span>Mayday Re.Poem</span>
