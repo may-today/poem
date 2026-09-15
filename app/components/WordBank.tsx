@@ -10,7 +10,7 @@ type Props = WordSelectionProps & ReturnType<typeof useWordSuggestions> & {
 }
 
 export default function WordBank({ query, setQuery, candidates, refresh, listKey, selectedIds, onSelect, onOpenLibrary, layout = 'panel', marquee = false }: Props) {
-  const hint = query ? `找到 ${candidates.length} 个` : '每次随机出现一组'
+  const hint = query ? `找到 ${candidates.length} 个` : ''
   const search = (
     <label className="search-field">
       <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
