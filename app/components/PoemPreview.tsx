@@ -1,11 +1,22 @@
 import { useState, type CSSProperties } from 'react'
 import type { Word } from '../poem-state'
 import { copyPoem, downloadPoem, poemSourceText } from '../lib/poem-export'
+import { slipFor, type Slip } from '../lib/collage'
 
 type Props = { lines: Word[][]; onEdit: () => void }
 
+const slipStyle = (slip: Slip, order: number): CSSProperties =>
+  ({
+    '--slip-tilt': `${slip.tilt}deg`,
+    '--slip-shift': `${slip.shift}em`,
+    '--slip-gap': `${slip.gap}em`,
+    '--j': order,
+  }) as CSSProperties
+
 export default function PoemPreview({ lines, onEdit }: Props) {
   const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const written = lines.filter((line) => line.length)
+  let order = 0
 
   async function handleCopy() {
     try {
@@ -20,8 +31,14 @@ export default function PoemPreview({ lines, onEdit }: Props) {
     <section className="preview-screen">
       <article className="poem-card" aria-label="诗歌预览">
         <div className="poem-lines">
-          {lines.filter((line) => line.length).map((line, index) => (
-            <p key={index} style={{ '--i': index } as CSSProperties}>{line.map((word) => word.text).join('')}</p>
+          {written.map((line, index) => (
+            <p key={index} style={{ '--i': index } as CSSProperties}>
+              {line.map((word) => (
+                <span key={word.id} className="poem-slip" style={slipStyle(slipFor(word.id), order++)}>
+                  {word.text}
+                </span>
+              ))}
+            </p>
           ))}
         </div>
         <footer>

@@ -647,19 +647,50 @@ h1.logo {
   transform: rotate(-.6deg);
   animation: card-in var(--dur-slow) var(--ease-out) both;
 }
-.card-label { margin: 0; color: var(--blue); font-size: 11px; letter-spacing: .22em; }
-.poem-lines { flex: 1; padding: 48px 0; }
-.poem-lines p {
-  margin: 0 0 18px;
-  font-family: var(--font-poem);
-  font-size: 22px;
-  line-height: 1.7;
-  letter-spacing: .06em;
-  animation: line-in var(--dur-slow) var(--ease-out) both;
-  animation-delay: calc(120ms + var(--i, 0) * 90ms);
+.poem-lines {
+  --slip-size: 22px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--slip-size) * 1.05);
+  padding: 34px 0 34px;
 }
-.poem-card footer { display: flex; flex-direction: column; align-self: flex-end; max-width: 80%; color: #b0b5ba; font-size: 12px; letter-spacing: .04em; text-align: right; overflow-wrap: anywhere; }
-.poem-card footer small { min-width: 0; font-size: inherit; line-height: 1.6; }
+.poem-lines p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: calc(var(--slip-size) * 0.32);
+  margin: 0;
+  padding: 0 2px;
+}
+
+/* 词片：一张张剪下来贴上去，字号与纸色统一，只有角度错落 */
+.poem-slip {
+  --slip-tilt: 0deg;
+  --slip-shift: 0em;
+  --slip-gap: 0em;
+  position: relative;
+  display: inline-block;
+  margin: 3px var(--slip-gap) 3px 0;
+  padding: .16em .3em .2em;
+  border-radius: 2px;
+  background: #fffdf8;
+  color: var(--ink);
+  font-family: var(--font-poem);
+  font-size: var(--slip-size);
+  line-height: 1.45;
+  letter-spacing: .05em;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  transform: translateY(var(--slip-shift)) rotate(var(--slip-tilt));
+  box-shadow: inset 0 0 0 1px rgb(28 33 38 / 6%), 0 1px 3px -1px rgb(23 44 58 / 18%);
+  animation: slip-in var(--dur-slow) var(--ease-spring) both;
+  animation-delay: calc(140ms + var(--j, 0) * 32ms);
+}
+
+.poem-card footer { display: flex; flex-direction: column; align-items: flex-end; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--rule); color: #b0b5ba; font-size: 12px; letter-spacing: .04em; text-align: right; overflow-wrap: anywhere; }
+.poem-card footer small { min-width: 0; max-width: 92%; font-size: inherit; line-height: 1.6; transform: rotate(-.7deg); transform-origin: 100% 50%; }
 .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
 .action-row .primary-button { grid-column: 1 / -1; }
 
@@ -741,9 +772,9 @@ h1.logo {
   from { opacity: 0; transform: translateY(22px) rotate(1.5deg) scale(.98); }
   to { opacity: 1; transform: translateY(0) rotate(-.6deg) scale(1); }
 }
-@keyframes line-in {
-  from { opacity: 0; transform: translateY(6px); filter: blur(2px); }
-  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+@keyframes slip-in {
+  from { opacity: 0; transform: translateY(calc(var(--slip-shift) + 10px)) rotate(0deg) scale(.95); }
+  to { opacity: 1; transform: translateY(var(--slip-shift)) rotate(var(--slip-tilt)) scale(1); }
 }
 /* 只动 opacity：transform 会让内部 position: fixed 的底栏失效 */
 @keyframes view-in {
@@ -849,7 +880,7 @@ h1.logo {
 
   .preview-screen { display: grid; grid-template-columns: minmax(0, 620px) 240px; gap: 40px; justify-content: center; align-items: start; padding-top: 40px; }
   .poem-card { min-height: 560px; padding: 40px 44px 32px; }
-  .poem-lines p { font-size: 26px; }
+  .poem-lines { --slip-size: 26px; }
   .action-row { grid-template-columns: 1fr; margin-top: 0; position: sticky; top: 40px; }
   .action-row .primary-button { order: -1; }
 
